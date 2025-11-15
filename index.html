@@ -6,30 +6,48 @@
   <style>
     *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
     body{background:#f6f6f6;padding:30px;transition:0.4s;}
-    .dark{background:#1a1a1a;color:white;}.container{max-width:520px;margin:auto;background:white;padding:25px;border-radius:20px;box-shadow:0 0 20px rgba(0,0,0,0.15);transition:0.3s;}
-.dark .container{background:#222;box-shadow:0 0 20px rgba(255,255,255,0.1);}    
+    .dark{background:#1a1a1a;color:white;}
+    .container{max-width:550px;margin:auto;background:white;padding:25px;border-radius:20px;box-shadow:0 0 25px rgba(0,0,0,0.2);transition:0.3s;animation:fadeIn 0.7s ease;}
+    .dark .container{background:#222;box-shadow:0 0 20px rgba(255,255,255,0.08);}    @keyframes fadeIn {from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
 
-h2{text-align:center;margin-bottom:20px;font-size:26px;}
+h2{text-align:center;margin-bottom:20px;font-size:28px;letter-spacing:1px;}
 
-input, select, button{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #ccc;font-size:15px;}
+input, select, button{
+  width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #ccc;font-size:15px;
+  transition:0.3s;
+}
+
+input:focus, select:focus{border-color:#007bff;box-shadow:0 0 8px rgba(0,123,255,0.4);}
 
 button{background:#111;color:white;border:none;font-size:16px;cursor:pointer;transition:0.3s;}
-button:hover{opacity:0.85;}
+button:hover{opacity:0.85;transform:scale(1.03);}    
 
 .stats{display:flex;justify-content:space-between;margin:20px 0;font-size:18px;}
 
 .list{margin-top:20px;}
-.item{background:#f0f0f0;padding:15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;transition:0.3s;}
+.item{
+  background:#f0f0f0;padding:15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;
+  transition:0.3s;opacity:0;animation:fadeItem 0.4s forwards;
+}
 .dark .item{background:#333;}
 
-.del{background:red;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
+@keyframes fadeItem{to{opacity:1;}}
+
+.del{background:red;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;transition:0.2s;}
+.del:hover{background:#b30000;transform:scale(1.1);}    
 
 .top-buttons{display:flex;gap:10px;margin-bottom:15px;}
 .dark-btn{background:#444;color:white;}
 
+.footer{
+  text-align:center;margin-top:30px;font-size:14px;opacity:0.7;
+  padding-top:12px;border-top:1px solid #ccc;
+}
+
   </style>
 </head>
-<body id="body">  <div class="container">
+<body id="body">  
+  <div class="container">
     <h2>💼 Professional Expense Tracker</h2><div class="top-buttons">
   <button onclick="toggleDark()" class="dark-btn">Toggle Dark Mode</button>
   <button onclick="resetAll()" style="background:#c40000">Reset All</button>
@@ -56,135 +74,17 @@ button:hover{opacity:0.85;}
   <p><b>Balance:</b> ₹<span id="balance">0</span></p>
 </div>
 
+<input type="text" id="search" placeholder="Search expenses..." style="margin-top:10px;">
+
+<canvas id="chart" style="margin-top:25px;width:100%;"></canvas>
+
+<button onclick="downloadCSV()" style="background:#0066cc;margin-top:15px;">Download CSV</button>
+
 <div class="list" id="list"></div>
 
-  </div>  <script>
-    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-    let income = Number(localStorage.getItem('income')) || 0;
+<div class="footer">🔧 Built by <b>Jethro Ephraim</b> — Precision. Performance. Professionalism.</div>
 
-    function save(){localStorage.setItem('expenses', JSON.stringify(expenses));}
-
-    function setIncome(){
-      income = Number(document.getElementById('income').value);
-      localStorage.setItem('income', income);
-      render();
-    }
-
-    function toggleDark(){document.getElementById('body').classList.toggle('dark');}
-
-    function resetAll(){
-      if(confirm('Are you sure?')){
-        expenses=[]; income=0;
-        localStorage.clear();
-        render();
-      }
-    }
-
-    function render(){
-      const list=document.getElementById('list');
-      const total=document.getElementById('total');
-      const balance=document.getElementById('balance');
-      list.innerHTML='';
-      let sum=0;
-
-      expenses.forEach(e=>{
-        sum += Number(e.amount);
-        const div=document.createElement('div');
-        div.className='item';
-        div.innerHTML=`
-          <div>
-            <b>${e.title}</b> - ₹${e.amount}<br>
-            <small>${e.category}</small>
-          </div>
-          <button class="del" onclick="delExpense(${e.id})">X</button>`;
-        list.appendChild(div);
-      });
-
-      total.textContent=sum;
-      balance.textContent = income - sum;
-    }
-
-    function addExpense(){
-      const t=document.getElementById('title').value;
-      const a=document.getElementById('amount').value;
-      const c=document.getElementById('category').value;
-      if(!t||!a) return alert('Fill all fields');
-
-      expenses.push({id:Date.now(), title:t, amount:a, category:c});
-      save(); render();
-
-      document.getElementById('title').value='';
-      document.getElementById('amount').value='';
-    }
-
-    function delExpense(id){
-      expenses=expenses.filter(e=>e.id!==id);
-      save(); render();
-    }
-
-    render();
-  </script>  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script><canvas id="chart" style="margin-top:25px;width:100%;"></canvas>
-
-  <script>
-    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-    let income = Number(localStorage.getItem('income')) || 0;
-    let chart;
-
-    function save(){ localStorage.setItem('expenses', JSON.stringify(expenses)); }
-
-    function setIncome(){ income = Number(document.getElementById('income').value); localStorage.setItem('income', income); render(); updateChart(); }
-
-    function toggleDark(){ document.getElementById('body').classList.toggle('dark'); }
-
-    function resetAll(){ if(confirm('Are you sure?')){ expenses=[]; income=0; localStorage.clear(); render(); updateChart(); } }
-
-    function render(){
-      const list=document.getElementById('list');
-      const total=document.getElementById('total');
-      const balance=document.getElementById('balance');
-      list.innerHTML='';
-      let sum=0;
-
-      expenses.forEach(e=>{
-        sum += Number(e.amount);
-        const div=document.createElement('div');
-        div.className='item';
-        div.innerHTML=<div><b>${e.title}</b> - ₹${e.amount}<br><small>${e.category}</small></div><button class="del" onclick="delExpense(${e.id})">X</button>;
-        list.appendChild(div);
-      });
-
-      total.textContent=sum;
-      balance.textContent = income - sum;
-    }
-
-    function addExpense(){
-      const t=document.getElementById('title').value;
-      const a=document.getElementById('amount').value;
-      const c=document.getElementById('category').value;
-      if(!t||!a) return alert('Fill all fields');
-      expenses.push({id:Date.now(), title:t, amount:a, category:c});
-      save(); render(); updateChart();
-      document.getElementById('title').value=''; document.getElementById('amount').value='';
-    }
-
-    function delExpense(id){ expenses=expenses.filter(e=>e.id!==id); save(); render(); updateChart(); }
-
-    function updateChart(){
-      const ctx=document.getElementById("chart");
-      let categories={};
-      expenses.forEach(e=>{ categories[e.category]=(categories[e.category]||0)+Number(e.amount); });
-
-      if(chart) chart.destroy();
-
-      chart=new Chart(ctx,{ type:"pie", data:{ labels:Object.keys(categories), datasets:[{ data:Object.values(categories) }] }});
-    }
-
-    render(); updateChart();
-  </script>  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script><canvas id="chart" style="margin-top:25px;width:100%;"></canvas>
-
-  <input type="text" id="search" placeholder="Search expenses..." style="margin-top:15px;"><button onclick="downloadCSV()" style="background:#0066cc;margin-top:10px;">Download CSV</button>
-
-  <script>
+  </div>  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <script>
     let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
     let income = Number(localStorage.getItem('income')) || 0;
     let chart;
@@ -214,10 +114,8 @@ button:hover{opacity:0.85;}
           sum += Number(e.amount);
           const div=document.createElement('div');
           div.className='item';
-          div.style.opacity=0;
           div.innerHTML=<div><b>${e.title}</b> - ₹${e.amount}<br><small>${e.category}</small></div><button class="del" onclick="delExpense(${e.id})">X</button>;
           list.appendChild(div);
-          setTimeout(()=>{div.style.opacity=1; div.style.transition='0.3s';},10);
         });
 
       total.textContent=sum;
@@ -243,14 +141,12 @@ button:hover{opacity:0.85;}
 
       if(chart) chart.destroy();
 
-      chart=new Chart(ctx,{ type:"bar", data:{ labels:Object.keys(categories), datasets:[{ data:Object.values(categories) }] }});
+      chart=new Chart(ctx,{ type:"bar", data:{ labels:Object.keys(categories), datasets:[{ data:Object.values(categories) }] } });
     }
 
     function downloadCSV(){
-      let csv='Title,Amount,Category
-';
-      expenses.forEach(e=>{ csv+=`${e.title},${e.amount},${e.category}
-`; });
+      let csv='Title,Amount,Category\n';
+      expenses.forEach(e=>{ csv+=${e.title},${e.amount},${e.category}\n; });
       const blob=new Blob([csv],{type:'text/csv'});
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a'); a.href=url; a.download='expenses.csv'; a.click(); URL.revokeObjectURL(url);
