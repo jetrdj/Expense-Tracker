@@ -1,248 +1,261 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Professional Expense Tracker</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", sans-serif; }
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+    body{background:#f6f6f6;padding:30px;transition:0.4s;}
+    .dark{background:#1a1a1a;color:white;}.container{max-width:520px;margin:auto;background:white;padding:25px;border-radius:20px;box-shadow:0 0 20px rgba(0,0,0,0.15);transition:0.3s;}
+.dark .container{background:#222;box-shadow:0 0 20px rgba(255,255,255,0.1);}    
 
-    body { background: linear-gradient(135deg, #e6e9f0, #eef1f5); padding: 40px; transition: 0.4s; }
+h2{text-align:center;margin-bottom:20px;font-size:26px;}
 
-    .dark { background: linear-gradient(135deg, #0f0f0f, #232323); color: white; }
+input, select, button{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #ccc;font-size:15px;}
 
-    .container { max-width: 650px; margin: auto; background: rgba(255, 255, 255, 0.3); padding: 28px; border-radius: 18px; backdrop-filter: blur(10px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); animation: fadeIn 0.7s ease; }
+button{background:#111;color:white;border:none;font-size:16px;cursor:pointer;transition:0.3s;}
+button:hover{opacity:0.85;}
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.stats{display:flex;justify-content:space-between;margin:20px 0;font-size:18px;}
 
-    h2 { text-align: center; margin-bottom: 18px; font-size: 26px; letter-spacing: 1px; }
+.list{margin-top:20px;}
+.item{background:#f0f0f0;padding:15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;transition:0.3s;}
+.dark .item{background:#333;}
 
-    input, select, button { width: 100%; padding: 12px; margin: 7px 0; border-radius: 10px; border: 1px solid #ccc; font-size: 15px; transition: 0.3s; }
+.del{background:red;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
 
-    input:focus, select:focus { border-color: #007bff; box-shadow: 0 0 10px rgba(0, 123, 255, 0.4); }
+.top-buttons{display:flex;gap:10px;margin-bottom:15px;}
+.dark-btn{background:#444;color:white;}
 
-    button { background: #2575fc; color: white; border: none; cursor: pointer; }
-
-    button:hover { transform: scale(1.03); opacity: 0.9; }
-
-    .stats { display: flex; justify-content: space-between; margin: 15px 0; font-size: 17px; }
-
-    .list { margin-top: 18px; }
-
-    .item { background: rgba(255, 255, 255, 0.6); padding: 14px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; animation: fadeItem 0.6s ease forwards; transform-origin: left; }
-
-    @keyframes fadeItem { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-    .del { background: red; border: none; color: white; padding: 5px 12px; border-radius: 6px; }
-
-    .toast { position: fixed; top: 20px; right: 20px; background: #333; color: white; padding: 12px 18px; border-radius: 8px; display: none; z-index: 100; animation: slideIn 0.5s ease; }
-
-    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-
-    .footer { text-align: center; margin-top: 25px; opacity: 0.7; font-size: 14px; }
   </style>
 </head>
+<body id="body">  <div class="container">
+    <h2>💼 Professional Expense Tracker</h2><div class="top-buttons">
+  <button onclick="toggleDark()" class="dark-btn">Toggle Dark Mode</button>
+  <button onclick="resetAll()" style="background:#c40000">Reset All</button>
+</div>
 
-<body id="body">
+<input type="number" id="income" placeholder="Enter Income" />
+<button onclick="setIncome()">Save Income</button>
 
-  <div class="container">
-    <h2>💼 Professional Expense Tracker</h2>
+<input type="text" id="title" placeholder="Expense Title" />
+<input type="number" id="amount" placeholder="Amount" />
 
-    <div class="top-buttons">
-      <button id="toggleDark">Toggle Dark Mode</button>
-      <button id="resetAll">Reset All</button>
-      <button id="toggleChart">Switch Chart</button>
-    </div>
+<select id="category">
+  <option>Food</option>
+  <option>Travel</option>
+  <option>Bills</option>
+  <option>Shopping</option>
+  <option>Others</option>
+</select>
 
-    <input type="number" id="income" placeholder="Enter Income" />
-    <button id="setIncome">Save Income</button>
+<button onclick="addExpense()">Add Expense</button>
 
-    <input type="text" id="title" placeholder="Expense Title" />
-    <input type="number" id="amount" placeholder="Amount" />
+<div class="stats">
+  <p><b>Total Expense:</b> ₹<span id="total">0</span></p>
+  <p><b>Balance:</b> ₹<span id="balance">0</span></p>
+</div>
 
-    <select id="category">
-      <option>Food</option>
-      <option>Travel</option>
-      <option>Bills</option>
-      <option>Shopping</option>
-      <option>Others</option>
-    </select>
+<div class="list" id="list"></div>
 
-    <button id="addExpense">Add Expense</button>
+  </div>  <script>
+    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+    let income = Number(localStorage.getItem('income')) || 0;
 
-    <select id="monthFilter">
-      <option value="">All Months</option>
-      <option value="0">January</option>
-      <option value="1">February</option>
-      <option value="2">March</option>
-      <option value="3">April</option>
-      <option value="4">May</option>
-      <option value="5">June</option>
-      <option value="6">July</option>
-      <option value="7">August</option>
-      <option value="8">September</option>
-      <option value="9">October</option>
-      <option value="10">November</option>
-      <option value="11">December</option>
-    </select>
+    function save(){localStorage.setItem('expenses', JSON.stringify(expenses));}
 
-    <div class="stats">
-      <p><b>Total:</b> ₹<span id="total">0</span></p>
-      <p><b>Balance:</b> ₹<span id="balance">0</span></p>
-    </div>
+    function setIncome(){
+      income = Number(document.getElementById('income').value);
+      localStorage.setItem('income', income);
+      render();
+    }
 
-    <canvas id="chart" style="margin-top:20px;"></canvas>
-    <button id="downloadPDF">Download Report (PDF)</button>
+    function toggleDark(){document.getElementById('body').classList.toggle('dark');}
 
-    <div class="list" id="list"></div>
+    function resetAll(){
+      if(confirm('Are you sure?')){
+        expenses=[]; income=0;
+        localStorage.clear();
+        render();
+      }
+    }
 
-    <div class="footer">🔧 Built by <b>Jethro Ephraim</b> — Precision · Performance · Professionalism.</div>
-  </div>
+    function render(){
+      const list=document.getElementById('list');
+      const total=document.getElementById('total');
+      const balance=document.getElementById('balance');
+      list.innerHTML='';
+      let sum=0;
 
-  <div class="toast" id="toast"></div>
+      expenses.forEach(e=>{
+        sum += Number(e.amount);
+        const div=document.createElement('div');
+        div.className='item';
+        div.innerHTML=`
+          <div>
+            <b>${e.title}</b> - ₹${e.amount}<br>
+            <small>${e.category}</small>
+          </div>
+          <button class="del" onclick="delExpense(${e.id})">X</button>`;
+        list.appendChild(div);
+      });
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+      total.textContent=sum;
+      balance.textContent = income - sum;
+    }
+
+    function addExpense(){
+      const t=document.getElementById('title').value;
+      const a=document.getElementById('amount').value;
+      const c=document.getElementById('category').value;
+      if(!t||!a) return alert('Fill all fields');
+
+      expenses.push({id:Date.now(), title:t, amount:a, category:c});
+      save(); render();
+
+      document.getElementById('title').value='';
+      document.getElementById('amount').value='';
+    }
+
+    function delExpense(id){
+      expenses=expenses.filter(e=>e.id!==id);
+      save(); render();
+    }
+
+    render();
+  </script>  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script><canvas id="chart" style="margin-top:25px;width:100%;"></canvas>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-      let income = Number(localStorage.getItem('income')) || 0;
-      let chartType = 'bar';
-      let chart;
+    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+    let income = Number(localStorage.getItem('income')) || 0;
+    let chart;
 
-      const showToast = (msg) => {
-        const toast = document.getElementById('toast');
-        toast.textContent = msg;
-        toast.style.display = 'block';
-        setTimeout(() => (toast.style.display = 'none'), 2000);
-      };
+    function save(){ localStorage.setItem('expenses', JSON.stringify(expenses)); }
 
-      const toggleDark = () => {
-        document.getElementById('body').classList.toggle('dark');
-        showToast("Theme Changed!");
-      };
+    function setIncome(){ income = Number(document.getElementById('income').value); localStorage.setItem('income', income); render(); updateChart(); }
 
-      const save = () => {
-        localStorage.setItem('expenses', JSON.stringify(expenses));
-      };
+    function toggleDark(){ document.getElementById('body').classList.toggle('dark'); }
 
-      const setIncome = () => {
-        income = Number(document.getElementById('income').value);
-        localStorage.setItem('income', income);
-        render();
-        updateChart();
-        showToast("Income Saved!");
-      };
+    function resetAll(){ if(confirm('Are you sure?')){ expenses=[]; income=0; localStorage.clear(); render(); updateChart(); } }
 
-      const resetAll = () => {
-        if (confirm("Are you sure? All data will be lost.")) {
-          expenses = [];
-          income = 0;
-          localStorage.clear();
-          render();
-          updateChart();
-          showToast("Reset Complete!");
-        }
-      };
+    function render(){
+      const list=document.getElementById('list');
+      const total=document.getElementById('total');
+      const balance=document.getElementById('balance');
+      list.innerHTML='';
+      let sum=0;
 
-      const addExpense = () => {
-        const title = document.getElementById('title').value;
-        const amount = +document.getElementById('amount').value;
-        const category = document.getElementById('category').value;
-        const date = new Date();
+      expenses.forEach(e=>{
+        sum += Number(e.amount);
+        const div=document.createElement('div');
+        div.className='item';
+        div.innerHTML=<div><b>${e.title}</b> - ₹${e.amount}<br><small>${e.category}</small></div><button class="del" onclick="delExpense(${e.id})">X</button>;
+        list.appendChild(div);
+      });
 
-        if (!title || !amount) return alert("Fill all fields");
+      total.textContent=sum;
+      balance.textContent = income - sum;
+    }
 
-        expenses.push({
-          id: Date.now(),
-          title,
-          amount,
-          category,
-          month: date.getMonth()
-        });
-        save();
-        render();
-        updateChart();
-        document.getElementById('title').value = '';
-        document.getElementById('amount').value = '';
-        showToast("Expense Added!");
-      };
+    function addExpense(){
+      const t=document.getElementById('title').value;
+      const a=document.getElementById('amount').value;
+      const c=document.getElementById('category').value;
+      if(!t||!a) return alert('Fill all fields');
+      expenses.push({id:Date.now(), title:t, amount:a, category:c});
+      save(); render(); updateChart();
+      document.getElementById('title').value=''; document.getElementById('amount').value='';
+    }
 
-      const delExpense = (id) => {
-        expenses = expenses.filter(e => e.id !== id);
-        save();
-        render();
-        updateChart();
-        showToast("Expense Removed!");
-      };
+    function delExpense(id){ expenses=expenses.filter(e=>e.id!==id); save(); render(); updateChart(); }
 
-      const toggleChart = () => {
-        chartType = chartType === 'bar' ? 'pie' : 'bar';
-        updateChart();
-        showToast(Switched to ${chartType.toUpperCase()} Chart);
-      };
+    function updateChart(){
+      const ctx=document.getElementById("chart");
+      let categories={};
+      expenses.forEach(e=>{ categories[e.category]=(categories[e.category]||0)+Number(e.amount); });
 
-      const updateChart = () => {
-        const ctx = document.getElementById("chart");
-        const categories = {};
-        const filterMonth = document.getElementById('monthFilter').value;
+      if(chart) chart.destroy();
 
-        expenses
-          .filter(e => filterMonth === '' || e.month == filterMonth)
-          .forEach(e => {
-            categories[e.category] = (categories[e.category] || 0) + e.amount;
-          });
+      chart=new Chart(ctx,{ type:"pie", data:{ labels:Object.keys(categories), datasets:[{ data:Object.values(categories) }] }});
+    }
 
-        if (chart) chart.destroy();
+    render(); updateChart();
+  </script>  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script><canvas id="chart" style="margin-top:25px;width:100%;"></canvas>
 
-        chart = new Chart(ctx, {
-          type: chartType,
-          data: {
-            labels: Object.keys(categories),
-            datasets: [{
-              data: Object.values(categories),
-              backgroundColor: ['#FF8C00', '#1E90FF', '#32CD32', '#FF69B4', '#FFD700'],
-            }]
-          }
-        });
-      };
+  <input type="text" id="search" placeholder="Search expenses..." style="margin-top:15px;"><button onclick="downloadCSV()" style="background:#0066cc;margin-top:10px;">Download CSV</button>
 
-      const downloadPDF = () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFontSize(16);
-        doc.text("Expense Summary Report", 10, 10);
-        doc.setFontSize(12);
-        let y = 20;
+  <script>
+    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+    let income = Number(localStorage.getItem('income')) || 0;
+    let chart;
 
-        expenses.forEach((e, index) => {
-          doc.text(${index + 1}. ${e.title} - ₹${e.amount} (${e.category}), 10, y);
-          y += 10;
+    document.getElementById('search').addEventListener('input', render);
+
+    function save(){ localStorage.setItem('expenses', JSON.stringify(expenses)); }
+
+    function setIncome(){ income = Number(document.getElementById('income').value); localStorage.setItem('income', income); render(); updateChart(); }
+
+    function toggleDark(){ document.getElementById('body').classList.toggle('dark'); }
+
+    function resetAll(){ if(confirm('Are you sure?')){ expenses=[]; income=0; localStorage.clear(); render(); updateChart(); } }
+
+    function render(){
+      const list=document.getElementById('list');
+      const total=document.getElementById('total');
+      const balance=document.getElementById('balance');
+      const search=document.getElementById('search').value.toLowerCase();
+
+      list.innerHTML='';
+      let sum=0;
+
+      expenses
+        .filter(e => e.title.toLowerCase().includes(search) || e.category.toLowerCase().includes(search))
+        .forEach(e=>{
+          sum += Number(e.amount);
+          const div=document.createElement('div');
+          div.className='item';
+          div.style.opacity=0;
+          div.innerHTML=<div><b>${e.title}</b> - ₹${e.amount}<br><small>${e.category}</small></div><button class="del" onclick="delExpense(${e.id})">X</button>;
+          list.appendChild(div);
+          setTimeout(()=>{div.style.opacity=1; div.style.transition='0.3s';},10);
         });
 
-        doc.text(Total Expenses: ₹${document.getElementById('total').textContent}, 10, y + 10);
-        doc.text(Balance: ₹${document.getElementById('balance').textContent}, 10, y + 20);
+      total.textContent=sum;
+      balance.textContent = income - sum;
+    }
 
-        doc.save("Expense_Report.pdf");
-        showToast("PDF Downloaded!");
-      };
+    function addExpense(){
+      const t=document.getElementById('title').value;
+      const a=document.getElementById('amount').value;
+      const c=document.getElementById('category').value;
+      if(!t||!a) return alert('Fill all fields');
+      expenses.push({id:Date.now(), title:t, amount:a, category:c});
+      save(); render(); updateChart();
+      document.getElementById('title').value=''; document.getElementById('amount').value='';
+    }
 
-      const render = () => {
-        const list = document.getElementById('list');
-        const totalEl = document.getElementById('total');
-        const balanceEl = document.getElementById('balance');
-        const filterMonth = document.getElementById('monthFilter').value;
-        
-        list.innerHTML = '';
-        let sum = 0;
+    function delExpense(id){ expenses=expenses.filter(e=>e.id!==id); save(); render(); updateChart(); }
 
-        expenses
-          .filter(e => filterMonth === '' || e.month == filterMonth)
-          .forEach(e => {
-            sum += e.amount;
-            const div = document.createElement('div');
-            div.className = 'item';
-            div.innerHTML = `
-              <div><b
+    function updateChart(){
+      const ctx=document.getElementById("chart");
+      let categories={};
+      expenses.forEach(e=>{ categories[e.category]=(categories[e.category]||0)+Number(e.amount); });
 
+      if(chart) chart.destroy();
+
+      chart=new Chart(ctx,{ type:"bar", data:{ labels:Object.keys(categories), datasets:[{ data:Object.values(categories) }] }});
+    }
+
+    function downloadCSV(){
+      let csv='Title,Amount,Category
+';
+      expenses.forEach(e=>{ csv+=`${e.title},${e.amount},${e.category}
+`; });
+      const blob=new Blob([csv],{type:'text/csv'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download='expenses.csv'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    render(); updateChart();
+  </script></body>
+</html>
