@@ -5,148 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Professional Expense Tracker</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Segoe UI", sans-serif;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", sans-serif; }
 
-    body {
-      background: linear-gradient(135deg, #e6e9f0, #eef1f5);
-      padding: 40px;
-      transition: 0.4s;
-    }
+    body { background: linear-gradient(135deg, #e6e9f0, #eef1f5); padding: 40px; transition: 0.4s; }
 
-    .dark {
-      background: linear-gradient(135deg, #0f0f0f, #232323);
-      color: white;
-    }
+    .dark { background: linear-gradient(135deg, #0f0f0f, #232323); color: white; }
 
-    .container {
-      max-width: 650px;
-      margin: auto;
-      background: rgba(255, 255, 255, 0.3);
-      padding: 28px;
-      border-radius: 18px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-      animation: fadeIn 0.7s ease;
-    }
+    .container { max-width: 650px; margin: auto; background: rgba(255, 255, 255, 0.3); padding: 28px; border-radius: 18px; backdrop-filter: blur(10px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); animation: fadeIn 0.7s ease; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    h2 {
-      text-align: center;
-      margin-bottom: 18px;
-      font-size: 26px;
-      letter-spacing: 1px;
-    }
+    h2 { text-align: center; margin-bottom: 18px; font-size: 26px; letter-spacing: 1px; }
 
-    input, select, button {
-      width: 100%;
-      padding: 12px;
-      margin: 7px 0;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 15px;
-      transition: 0.3s;
-    }
+    input, select, button { width: 100%; padding: 12px; margin: 7px 0; border-radius: 10px; border: 1px solid #ccc; font-size: 15px; transition: 0.3s; }
 
-    input:focus, select:focus {
-      border-color: #007bff;
-      box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
-    }
+    input:focus, select:focus { border-color: #007bff; box-shadow: 0 0 10px rgba(0, 123, 255, 0.4); }
 
-    button {
-      background: #2575fc;
-      color: white;
-      border: none;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
+    button { background: #2575fc; color: white; border: none; cursor: pointer; }
 
-    button:hover {
-      transform: scale(1.03);
-      opacity: 0.9;
-    }
+    button:hover { transform: scale(1.03); opacity: 0.9; }
 
-    .stats {
-      display: flex;
-      justify-content: space-between;
-      margin: 15px 0;
-      font-size: 17px;
-    }
+    .stats { display: flex; justify-content: space-between; margin: 15px 0; font-size: 17px; }
 
-    .list {
-      margin-top: 18px;
-    }
+    .list { margin-top: 18px; }
 
-    .item {
-      background: rgba(255, 255, 255, 0.6);
-      padding: 14px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      animation: fadeItem 0.6s ease forwards;
-      transform-origin: left;
-    }
+    .item { background: rgba(255, 255, 255, 0.6); padding: 14px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; animation: fadeItem 0.6s ease forwards; transform-origin: left; }
 
     @keyframes fadeItem { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-    .del {
-      background: red;
-      border: none;
-      color: white;
-      padding: 5px 12px;
-      border-radius: 6px;
-    }
+    .del { background: red; border: none; color: white; padding: 5px 12px; border-radius: 6px; }
 
-    .toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #333;
-      color: white;
-      padding: 12px 18px;
-      border-radius: 8px;
-      display: none;
-      z-index: 100;
-      animation: slideIn 0.5s ease;
-    }
+    .toast { position: fixed; top: 20px; right: 20px; background: #333; color: white; padding: 12px 18px; border-radius: 8px; display: none; z-index: 100; animation: slideIn 0.5s ease; }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
-    .footer {
-      text-align: center;
-      margin-top: 25px;
-      opacity: 0.7;
-      font-size: 14px;
-    }
+    .footer { text-align: center; margin-top: 25px; opacity: 0.7; font-size: 14px; }
   </style>
 </head>
 
 <body id="body">
+
   <div class="container">
     <h2>💼 Professional Expense Tracker</h2>
 
     <div class="top-buttons">
-      <button onclick="toggleDark()">Toggle Dark Mode</button>
-      <button onclick="resetAll()">Reset All</button>
-      <button onclick="toggleChart()">Switch Chart</button>
+      <button id="toggleDark">Toggle Dark Mode</button>
+      <button id="resetAll">Reset All</button>
+      <button id="toggleChart">Switch Chart</button>
     </div>
 
     <input type="number" id="income" placeholder="Enter Income" />
-    <button onclick="setIncome()">Save Income</button>
+    <button id="setIncome">Save Income</button>
 
     <input type="text" id="title" placeholder="Expense Title" />
     <input type="number" id="amount" placeholder="Amount" />
@@ -159,7 +68,7 @@
       <option>Others</option>
     </select>
 
-    <button onclick="addExpense()">Add Expense</button>
+    <button id="addExpense">Add Expense</button>
 
     <select id="monthFilter">
       <option value="">All Months</option>
@@ -183,7 +92,7 @@
     </div>
 
     <canvas id="chart" style="margin-top:20px;"></canvas>
-    <button onclick="downloadPDF()">Download Report (PDF)</button>
+    <button id="downloadPDF">Download Report (PDF)</button>
 
     <div class="list" id="list"></div>
 
@@ -194,7 +103,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  
+
   <script>
     let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
     let income = Number(localStorage.getItem('income')) || 0;
@@ -329,7 +238,7 @@
           div.className = 'item';
           div.innerHTML = `
             <div><b>${e.title}</b> - ₹${e.amount}<br><small>${e.category}</small></div>
-            <button class="del" onclick="delExpense(${e.id})">X</button>`;
+            <button class="del" data-id="${e.id}">X</button>`;
           list.appendChild(div);
         });
 
@@ -340,6 +249,20 @@
     document.getElementById('monthFilter').addEventListener('change', () => {
       render();
       updateChart();
+    });
+
+    document.getElementById('toggleDark').addEventListener('click', toggleDark);
+    document.getElementById('resetAll').addEventListener('click', resetAll);
+    document.getElementById('toggleChart').addEventListener('click', toggleChart);
+    document.getElementById('setIncome').addEventListener('click', setIncome);
+    document.getElementById('addExpense').addEventListener('click', addExpense);
+    document.getElementById('downloadPDF').addEventListener('click', downloadPDF);
+
+    document.getElementById('list').addEventListener('click', (e) => {
+      if (e.target.classList.contains('del')) {
+        const id = e.target.getAttribute('data-id');
+        delExpense(Number(id));
+      }
     });
 
     render();
